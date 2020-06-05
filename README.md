@@ -4,7 +4,7 @@
 <!-- badges: start -->
 <!-- badges: end -->
 
-The goal of mosqcontrol is to ...
+This project aims to make an accessible model for mosquito control resource optimization. The model uses data provided by users to estimate the mosquito populations in the sampling area for the sampling timeperiod, and the optimal time to apply a treatment or multiple treatments.
 
 ## Installation
 
