@@ -48,6 +48,9 @@ e.g. 1\% to 30\% knockdown).}
 \item{days_between}{Numeric minimum number of days allowed between pulses
 set by user (integer bewtween 0 and 30 days).}
 }
+\value{
+Control list of control parameters.
+}
 \description{
-Optimal Control
+Creates optimal schedule of pulses for mosquito control.
 }
