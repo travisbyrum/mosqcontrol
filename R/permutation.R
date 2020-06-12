@@ -17,7 +17,11 @@ uperm <- function(d) {
   }
 
   a <- N - c(0, cumsum(n))[-(ng + 1)]
-  foo <- lapply(1:ng, function(i) matrix(combn(a[i], n[i]), nrow = n[i]))
+  foo <- lapply(
+    1:ng,
+    function(i) matrix(utils::combn(a[i], n[i]), nrow = n[i])
+  )
+
   out <- matrix(NA, nrow = N, ncol = prod(sapply(foo, ncol)))
   xxx <- c(0, cumsum(sapply(foo, nrow)))
   xxx <- cbind(xxx[-length(xxx)] + 1, xxx[-1])
@@ -36,7 +40,7 @@ uperm <- function(d) {
   k <- length(foo)
 
   out[xxx[k, 1]:xxx[k, 2], ] <- miss
-  out <- out[rank(as.numeric(dat), ties = "first"), ]
+  out <- out[rank(as.numeric(dat), ties.method = "first"), ]
   foo <- cbind(as.vector(out), as.vector(col(out)))
 
   out[foo] <- d

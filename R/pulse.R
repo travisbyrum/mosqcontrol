@@ -11,16 +11,25 @@
 #' @param kmax Numeric
 #' @param modes Numeric
 sum_one_pulse <- function(z, rho, mu, tau, kmax, modes) {
-  jmax <- length(modes) # modes is the list of fourier modes, jmax = number of list elements
+  # modes is the list of fourier modes, jmax = number of list elements
+  jmax <- length(modes)
+
   out_val <- 0 # running total for output value
 
   p_func <- function(x) {
-    rho * 1 / (log(1 / (1 - rho)) - 2 * pi * complex(real = 0, imaginary = 1) * x)
-  }
-  q_func <- function(x) {
-    (rho / (1 - rho)) * 1 / (log(1 / (1 - rho)) + 2 * pi * complex(real = 0, imaginary = 1) * x)
+    rho * 1 / (
+      log(1 / (1 - rho)) - 2 *
+        pi *
+        complex(real = 0, imaginary = 1) *
+        x
+    )
   }
 
+  q_func <- function(x) {
+    (rho / (1 - rho)) *
+      1 / (log(1 / (1 - rho)) + 2 *
+             pi * complex(real = 0, imaginary = 1) * x)
+  }
 
   for (k in -kmax:kmax) {
     pre_factor <- p_func(k)
@@ -32,7 +41,9 @@ sum_one_pulse <- function(z, rho, mu, tau, kmax, modes) {
 
     for (j in (-jmax + 1):(jmax - 1)) {
       pre_factor <- q_func(-k - j)
-      post_factor <- exp(-2 * pi * complex(real = 0, imaginary = 1) * (-k - j) * z / tau)
+      post_factor <- exp(
+        -2 * pi * complex(real = 0, imaginary = 1) * (-k - j) * z / tau
+      )
 
       if (j == 0) {
         q_val <- q_val + pre_factor * post_factor * modes[1] / mu
@@ -43,8 +54,11 @@ sum_one_pulse <- function(z, rho, mu, tau, kmax, modes) {
       }
     }
 
-
-    out_val <- out_val + (P_val) * (q_val) / (1 - log(1 - rho) / (mu * tau) - 2 * pi * complex(real = 0, imaginary = 1) * k / (mu * tau))
+    out_val <- out_val + (P_val) *
+      (q_val) / (
+        1 - log(1 - rho) / (mu * tau) - 2 * pi *
+          complex(real = 0, imaginary = 1) * k / (mu * tau)
+      )
   }
 
   return(Re(out_val))
@@ -61,18 +75,25 @@ sum_one_pulse <- function(z, rho, mu, tau, kmax, modes) {
 #' @param z Numeric
 #' @param rho Numeric
 #' @param n_pulse Numeric
+#' @param mu Numeric
 #' @param tau Numeric
 #' @param kmax Numeric
 #' @param modes Numeric
 sum_n_pulse <- function(z, rho, n_pulse, mu, tau, kmax, modes) {
   jmax <- length(modes)
-  out_val <- 0 # running total for output
+
+  # running total for output
+  out_val <- 0
 
   for (k in -kmax:kmax) {
-    p_val <- product_values(z, rho, n_pulse, tau, k) # compute "P" product and exponentials at this k value
-    q_val <- 0 # running total for "Q" product and exponentials
+    # compute "P" product and exponentials at this k value
+    p_val <- product_values(z, rho, n_pulse, tau, k)
 
-    # add together "Q" products and exponentials at (k + j) value for all j emergence fourier modes
+    # running total for "Q" product and exponentials
+    q_val <- 0
+
+    # add together "Q" products and exponentials at (k + j)
+    # value for all j emergence fourier modes
     for (j in (-jmax + 1):(jmax - 1)) {
       if (j == 0) {
         q_val <- q_val + q_values(z, rho, n_pulse, tau, k, j) *
@@ -89,7 +110,8 @@ sum_n_pulse <- function(z, rho, n_pulse, mu, tau, kmax, modes) {
     # add contribution from this k value to running output total
     out_val <- out_val + (p_val) * (q_val) /
       (1 - n_pulse * log(1 - rho) /
-         (mu * tau) - 2 * pi * complex(real = 0, imaginary = 1) * k / (mu * tau))
+         (mu * tau) - 2 * pi * complex(real = 0, imaginary = 1) *
+         k / (mu * tau))
   }
 
   out <- Re(out_val)

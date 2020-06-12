@@ -1,5 +1,7 @@
 #' Optimal Control
 #'
+#' Creates optimal schedule of pulses for mosquito control.
+#'
 #' @param counts Numeric vector of population counts.
 #' @param time Numeric vector with corresponding day of year measurments.
 #' Example: Jan 1st = day 1.  Must be same length as \code{counts}.
@@ -20,6 +22,8 @@
 #' e.g. 1\% to 30\% knockdown).
 #' @param days_between Numeric minimum number of days allowed between pulses
 #' set by user (integer bewtween 0 and 30 days).
+#'
+#' @return Control list of control parameters.
 #'
 #' @export
 control <- function(counts,
@@ -74,7 +78,7 @@ control <- function(counts,
 
   J <- j_matrix(mu, n_pts, delta_t_dat)
   M <- m_matrix(mu, n_pts, delta_t_dat)
-  W <- weight_matrix(m, mu, n_pts, t_in)
+  W <- weight_matrix(m, mu, n_pts, t_in, n_pts)
 
   lambda_dat <- pracma::fmincon(
     numeric(n_pts),
@@ -155,6 +159,8 @@ control <- function(counts,
     }
 
     if (global_opt == 0) { # local optimum
+
+      # opt_out <- fmincon(guess, funN, gr = NULL, method = "SQP", A = A_mat, b = b_vec, Aeq = NULL, beq = NULL, lb = l_bound, ub = u_bound)
       opt_out <- pracma::fmincon(
         guess,
         funN,
@@ -282,7 +288,7 @@ control <- function(counts,
       ave_pop_un_cont = ave_pop_un_cont,
       ave_pop_cont = ave_pop_cont,
       percent_reduction = percent_reduction,
-      accuracy_measure,
+      accuracy_measure = accuracy_measure,
       tau = tau,
       t_dat_plot = t_dat_plot,
       y_dat = y_dat
@@ -293,33 +299,37 @@ control <- function(counts,
 
 #' @method summary mosqcontrol
 #' @export
-summary.mosqcontrol <- function(c) {
+summary.mosqcontrol <- function(object, ...) {
   structure(
     list(
-      tau = c$tau
+      tau = object$tau
     ),
     class = "summary.mosqcontrol"
   )
 }
 
 #' @method plot mosqcontrol
+#' @param ... Numeric, complex, or logical vectors.  Includes t_vec_plot,
+#' pop_un_cont, and pop_cont.
 #' @export
-plot.mosqcontrol <- function(c) {
-  plot(
-    c$t_dat_plot,
-    c$y_dat,
-    ylim = c(0, 1.5 * max(c$y_dat)),
-    xlim = c(c$t_dat_plot[1], c$t_dat_plot[1] + tau),
+plot.mosqcontrol <- function(x, ...) {
+  args <- list(...)
+
+  graphics::plot(
+    x$t_dat_plot,
+    x$y_dat,
+    ylim = c(0, 1.5 * max(x$y_dat)),
+    xlim = c(x$t_dat_plot[1], x$t_dat_plot[1] + x$tau),
     col = "blue",
     main = "Fitted Population Model",
     ylab = "Mosquito population count",
     xlab = "Day of year"
   )
 
-  lines(t_vec_plot, pop_un_cont, col = "red")
-  lines(t_vec_plot, pop_cont, col = "orange")
+  graphics::lines(args$t_vec_plot, args$pop_un_cont, col = "red")
+  graphics::lines(args$t_vec_plot, args$pop_cont, col = "orange")
 
-  legend(
+  graphics::legend(
     "topleft",
     c(
       "Data",

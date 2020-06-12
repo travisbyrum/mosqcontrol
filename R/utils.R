@@ -70,7 +70,7 @@ m_matrix <- function(mu, n, delta_t_dat) {
 }
 
 ### weight_matrix -------------------------------------------------------------
-weight_matrix <- function(m, mu, n, t_in) {
+weight_matrix <- function(mu, m, n, t_in, n_pts) {
   W <- matrix(0, nrow = n, ncol = n)
 
   if (t_in[(1)] - m / mu > 0) {
@@ -83,7 +83,7 @@ weight_matrix <- function(m, mu, n, t_in) {
     }
   } else {
     W[1, 1] <- 1
-    W[n - 1, N_pts - 1] <- 1
+    W[n - 1, n_pts - 1] <- 1
     W[n, n] <- 1
 
     for (i in 2:n - 2) {

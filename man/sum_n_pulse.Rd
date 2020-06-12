@@ -13,6 +13,8 @@ sum_n_pulse(z, rho, n_pulse, mu, tau, kmax, modes)
 
 \item{n_pulse}{Numeric}
 
+\item{mu}{Numeric}
+
 \item{tau}{Numeric}
 
 \item{kmax}{Numeric}

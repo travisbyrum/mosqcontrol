@@ -9,6 +9,7 @@
 #' @param n_pulse Numeric
 #' @param tau Numeric
 #' @param k Numeric
+#' @export
 product_values <- function(z, rho, n_pulse, tau, k) {
   p_func <- function(x) {
     rho * 1 / (log(1 / (1 - rho)) - 2 * pi * complex(real = 0, imaginary = 1) * x)
