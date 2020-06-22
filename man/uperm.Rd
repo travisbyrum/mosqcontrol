@@ -7,7 +7,7 @@
 uperm(d)
 }
 \arguments{
-\item{d}{List}
+\item{d}{Vector}
 }
 \description{
 \code{uperm} returns permutation matrix.
@@ -15,4 +15,7 @@ uperm(d)
 \details{
 For a given list of numbers, this function outputs a matrix, where each row
 is a unique permutation of the list.
+}
+\examples{
+uperm(c(1, 2))
 }

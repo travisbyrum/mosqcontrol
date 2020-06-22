@@ -25,3 +25,4 @@ sum_one_pulse(z, rho, mu, tau, kmax, modes)
 \details{
 This function computes the fourier sum for 1 pulse.
 }
+\keyword{internal}

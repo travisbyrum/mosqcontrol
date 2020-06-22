@@ -4,14 +4,14 @@
 \alias{sum_n_pulse}
 \title{sum_n_pulse}
 \usage{
-sum_n_pulse(z, rho, n_pulse, mu, tau, kmax, modes)
+sum_n_pulse(z, rho, Npulse, mu, tau, kmax, modes)
 }
 \arguments{
 \item{z}{Numeric}
 
 \item{rho}{Numeric}
 
-\item{n_pulse}{Numeric}
+\item{Npulse}{Numeric}
 
 \item{mu}{Numeric}
 
@@ -29,3 +29,4 @@ This function computes the Fourier sum for N pulses, where the "P" and "Q"
 products and exponentials are computeded by the "P_vals" and "q_vals"
 functions.
 }
+\keyword{internal}
