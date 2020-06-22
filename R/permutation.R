@@ -5,7 +5,10 @@
 #' For a given list of numbers, this function outputs a matrix, where each row
 #' is a unique permutation of the list.
 #'
-#' @param d List
+#' @param d Vector
+#' @export
+#' @examples
+#' uperm(c(1, 2))
 uperm <- function(d) {
   dat <- factor(d)
   N <- length(dat)

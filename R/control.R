@@ -25,6 +25,18 @@
 #'
 #' @return Control list of control parameters.
 #'
+#'@examples
+#'\dontrun{
+#'y_in <- c(15, 40, 45, 88, 99, 145, 111, 132, 177, 97, 94, 145, 123, 111,
+#'125, 115, 155, 160, 143, 132, 126, 125, 105, 98, 87, 54, 55, 8
+#')
+#'t_in_user <- c(93, 100, 107, 114, 121, 128, 135, 142, 149, 163, 170, 177,
+#'184, 191, 198, 205, 212, 219, 226, 233, 240, 247, 254, 261,
+#'267, 274, 281, 288
+#')
+#'value <- control(y_in, t_in_user)
+#'}
+#'
 #' @export
 control <- function(counts,
                     time,
@@ -159,8 +171,6 @@ control <- function(counts,
     }
 
     if (global_opt == 0) { # local optimum
-
-      # opt_out <- fmincon(guess, funN, gr = NULL, method = "SQP", A = A_mat, b = b_vec, Aeq = NULL, beq = NULL, lb = l_bound, ub = u_bound)
       opt_out <- pracma::fmincon(
         guess,
         funN,
@@ -173,7 +183,6 @@ control <- function(counts,
         lb = l_bound,
         ub = u_bound
       )
-
 
       times <- opt_out$par
       ave_pop_fourier <- opt_out$value
