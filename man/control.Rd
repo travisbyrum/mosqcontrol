@@ -14,7 +14,8 @@ control(
   global_opt = 0,
   n_pulse = 4,
   rho = 0.3,
-  days_between = 3
+  days_between = 3,
+  max_eval = 10000
 )
 }
 \arguments{
@@ -47,6 +48,8 @@ e.g. 1\% to 30\% knockdown).}
 
 \item{days_between}{Numeric minimum number of days allowed between pulses
 set by user (integer bewtween 0 and 30 days).}
+
+\item{max_eval}{Numeric maximum evaluations for optimization step.}
 }
 \value{
 Control list of control parameters.
@@ -55,7 +58,6 @@ Control list of control parameters.
 Creates optimal schedule of pulses for mosquito control.
 }
 \examples{
-\dontrun{
 y_in <- c(15, 40, 45, 88, 99, 145, 111, 132, 177, 97, 94, 145, 123, 111,
 125, 115, 155, 160, 143, 132, 126, 125, 105, 98, 87, 54, 55, 8
 )
@@ -63,7 +65,7 @@ t_in_user <- c(93, 100, 107, 114, 121, 128, 135, 142, 149, 163, 170, 177,
 184, 191, 198, 205, 212, 219, 226, 233, 240, 247, 254, 261,
 267, 274, 281, 288
 )
-value <- control(y_in, t_in_user)
-}
+value <- control(y_in, t_in_user, global_opt = 2, max_eval = 1)
+
 
 }

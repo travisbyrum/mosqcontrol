@@ -22,11 +22,11 @@
 #' e.g. 1\% to 30\% knockdown).
 #' @param days_between Numeric minimum number of days allowed between pulses
 #' set by user (integer bewtween 0 and 30 days).
+#' @param max_eval Numeric maximum evaluations for optimization step.
 #'
 #' @return Control list of control parameters.
 #'
 #'@examples
-#'\dontrun{
 #'y_in <- c(15, 40, 45, 88, 99, 145, 111, 132, 177, 97, 94, 145, 123, 111,
 #'125, 115, 155, 160, 143, 132, 126, 125, 105, 98, 87, 54, 55, 8
 #')
@@ -34,8 +34,8 @@
 #'184, 191, 198, 205, 212, 219, 226, 233, 240, 247, 254, 261,
 #'267, 274, 281, 288
 #')
-#'value <- control(y_in, t_in_user)
-#'}
+#'value <- control(y_in, t_in_user, global_opt = 2, max_eval = 1)
+#'
 #'
 #' @export
 control <- function(counts,
@@ -47,7 +47,8 @@ control <- function(counts,
                     global_opt = 0,
                     n_pulse = 4,
                     rho = .30,
-                    days_between = 3) {
+                    days_between = 3,
+                    max_eval = 10000) {
   assertthat::assert_that(
     length(counts) == length(time),
     msg = paste("input data mismatch")
@@ -131,7 +132,6 @@ control <- function(counts,
       ave_pop_fourier <- opt_out$value
     } else if (global_opt == 2) { # global optimum isres
 
-
       opt_out <- nloptr::nloptr(
         x0 = guess,
         eval_f = fun1,
@@ -139,7 +139,7 @@ control <- function(counts,
         ub = tau,
         eval_g_ineq = NULL,
         eval_g_eq = NULL,
-        opts = list(algorithm = "NLOPT_GN_ISRES", maxeval = 10000)
+        opts = list(algorithm = "NLOPT_GN_ISRES", maxeval = max_eval)
       )
 
       times <- opt_out$solution
@@ -205,7 +205,7 @@ control <- function(counts,
         ub = u_bound,
         eval_g_ineq = ineq,
         eval_g_eq = NULL,
-        opts = list(algorithm = "NLOPT_GN_ISRES", maxeval = 10000)
+        opts = list(algorithm = "NLOPT_GN_ISRES", maxeval = max_eval)
       )
 
       times <- opt_out$solution
