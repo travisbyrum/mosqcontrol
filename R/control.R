@@ -34,7 +34,7 @@
 #'184, 191, 198, 205, 212, 219, 226, 233, 240, 247, 254, 261,
 #'267, 274, 281, 288
 #')
-#'value <- control(y_in, t_in_user, global_opt = 2, max_eval = 1)
+#'control(y_in, t_in_user, global_opt = -1)
 #'
 #'
 #' @export
@@ -114,6 +114,24 @@ control <- function(counts,
     t_dat,
     delta_t_dat
   )
+
+  if (global_opt < 0) {
+    return(
+      structure(
+        list(
+          pulse_times_output = NULL,
+          ave_pop_un_cont = NULL,
+          ave_pop_cont = NULL,
+          percent_reduction = NULL,
+          accuracy_measure = NULL,
+          tau = tau,
+          t_dat_plot = NULL,
+          y_dat = y_dat
+        ),
+        class = "mosqcontrol"
+      )
+    )
+  }
 
   if (n_pulse == 1) {
     fun1 <- function(x) sum_one_pulse(x, rho, mu, tau, kmax, lam_fourier)

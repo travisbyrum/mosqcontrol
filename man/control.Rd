@@ -65,7 +65,7 @@ t_in_user <- c(93, 100, 107, 114, 121, 128, 135, 142, 149, 163, 170, 177,
 184, 191, 198, 205, 212, 219, 226, 233, 240, 247, 254, 261,
 267, 274, 281, 288
 )
-value <- control(y_in, t_in_user, global_opt = 2, max_eval = 1)
+control(y_in, t_in_user, global_opt = -1)
 
 
 }
