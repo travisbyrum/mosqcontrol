@@ -7,9 +7,61 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-# Setup
+## Setup
 
-Suppose we’re given a vector N noisy mosquito population estimates y = (y1, y2, ..., yN ) based on trap measurements which occur at times (t1, t2, ..., tN ), representative of the population’s evolution over the course of an entire season or year τ.
+Suppose we’re given a vector N noisy mosquito population estimates $\mathbf{y}=(y_1, y_2, y_3, ..., y_N)$ based on trap measurements which occur at times $(t_1, t_2, t_3, ..., yt_N)$ , representative of the population’s evolution over the course of an entire season or year $\tau$.
+
+**Problem**: Use the population data to determine a schedule for $N_{p}$ impulses to occur over a year, assuming that each impulse reduces the vector population by a fraction $\rho$. Let $\mathbf{z}=(z_1, z_2, ..., z_{p})$ denote the timing of the $N_{p}$ impulses.
+
+**Solution**: Assume that the true population obeys the following dynamics:
+
+$$
+\dot{x}(t) = \Lambda(t) − \mu x(t)
+$$
+
+where $\dot{x}(t)$ is the vector population at time $t$, $\Lambda(t)$ is a time-varying emergence rate, and $1/\mu$ is the natural vector lifetime.
+
+First, we fit this model to our trap data assuming we have an initial reasonable guess for $\mu$ based on the climate of the area under consideration. Specifically, we will attempt to find a $\tau$-periodic $\Lambda(t)$ for which the corresponding $\tau$-periodic solution $x(t)$ to Eq. (1) most closely matches the measurement data $\mathbf{y}$ over a single period. If the resulting fit is unsatisfactory, other reasonable values of μ can be tested to see if a better fit can be achieved, or we can try to include $\mu$ as additional parameter to fit. A simple scheme for actually doing such a fitting, assuming a value for $\mu$ is outlined in the next section.
+
+Next, we calculate the Fourier modes of our fitted emergence rate $\Lambda(t)$, and we denote the $n^{th}$ mode $\Lambda_n$. When the $N_{\rho}$ impulses are applied periodically with period $\tau$ to the dynamics in Eq. (1) under the fitted $\Lambda(t)$, the average $\langle x\rangle$ of the corresponding periodic population trajectory is given by
+
+$$
+\langle x\rangle=\sum_{j,k=-\infty}^{\infty}[\sum_{\substack{\sum_{l=1}^{p} n_l = k \\ \sum_{l=1}^{p} m_l = k+j}}^{}(\frac{\prod_{l=1}^{N_p} P_{n_l}Q_{-m_l}e^{\frac{-2\pi i (n_l - m_l)z_l}{\tau}}}{1-N_p\frac{\ln(1-\rho)}{\mu\tau}-\frac{2\pi ik}{\mu\tau}})]
+$$
+where
+
+$$
+P_n = \rho\frac{1}{\ln(\frac{1}{1-\rho})-2\pi i n}
+\\
+Q_n = \frac{\rho}{1-\rho}\frac{1}{\ln(\frac{1}{1-\rho})+2\pi i n}
+$$
+and where the expression
+
+$$
+\sum_{\substack{\sum_{l=1}^{p} n_l = k \\ \sum_{l=1}^{p} m_l = k+j}}
+$$
+
+denotes a summation over all integer $p$−tuples $(n_1, n_2, ..., n_p)$ and $(m_1, m_2, ..., m_p)$ such that $\sum_{l=1}^{p}$ and $\sum_{l=1}^{p} m_l = k+j$.
+
+
+To solve our optimal control problem, we simply find the global minimum of $\langle x\rangle$ with respect to the impulse timings $\mathbf{z}$.  This will give us the optimal schedule for $P$ impulses given the time- dependent emergence rate as estimated from our data. Although we have the analytic expression for $\langle x\rangle$, finding the global minimum may be challenging due to the large number of terms being summed over and the oscillatory behavior of these terms as a function of $\mathbf{z}$.  Hopefully, these difficulties can be somewhat mitigated by the decay of $P_n$ and $Q_n$ as $\frac{1}{|n|}$ (which limits the number of terms that need to be calculated in practice), and perhaps a good initial guess for $\mathbf{z}$ which will allow use of simpler local optimization methods like Newton’s method for finding the zeros of $\partial_{\mathbf{z}} \langle x\rangle$.
+
+
+**Input / Output**: The user will input the population data $\mathbf{y}$, corresponding times $(t_1, t_2, ..., t_N )$, season length $\tau$, estimated vector lifetime $\frac{1}{\mu}$, percent knockdown $\rho$, and number of impulses $P$.  The output will display the population curve from the data (assuming a linear interpolation between points), the fitted uncontrolled population curve, the optimal schedule for impulse timings, and the corresponding population curve under the impulse controls. If the algorithm doesn’t take too long, we could also perform the optimization for $P = 1, 2, ..., P_max$ and plot out the percent population reduction as a function of the number of impulses $P$.  It would be interesting to see a what point we get diminishing returns when adding more impulses.
+
+**Caveat**: In the problem set-up, we are looking for an impulse protocol to apply over a single season of length $\tau$ which will maximally reduce the mosquito population, given an emergence rate $\Lambda(t)$ inferred from our population model and single-season data. We are actually finding a $\tau$-periodic impulse protocol which minimizes, on average, the periodic equilibrium population, given a $\tau$-periodic emergence rate $\Lambda(t)$ inferred from our population model and single-season data. I think these problems will be roughly equivalent if we include enough zero measurements around the seasonal peak in the data vector $\mathbf{y}$ so that if we were to stitch two such data sequences to- gether, one after the other, the mosquito population will have effectively died out between the peaks (I’m still thinking about the logic of this, but I think it’s right). By including these zeros, when stitching together copies of a single-season population curve to form a periodic population curve, the populations between seasons will effectively evolve independently of one another, and there should be no interactions or synergistic effects between control impulses from different sea- sons. I think if this is the case, the optimal periodic control protocol will also optimally reduce the population over a single season.
+
+## Simple scheme for model fitting
+
+Here, I’m assume that we only have one season of data to work with. If we end up using the scheme outline here, then we’ll probably want to find a way to incorporate multiple seasons of data.
+
+We don’t really know anything about $\Lambda(t)$ and need to make some assumptions, so we are going to assume its form is a linear interpolation of the values $\lambda=(\lambda_1, \lambda_2, ..., \lambda_n)$ at times $(t_1, t_2, ..., t_N)$:
+
+$$
+\Lambda(t)=\lambda_{k+1}\frac{t-t_k}{\Delta t_k}+\lambda_k\frac{t_{k+1}-t}{\Delta t_k}, t \in [t_k, t_{k+1}], k = 1, 2, ..., N
+$$
+
+where $\Delta t_k=t_{k+1}-t_k$.  Note that the interval $[t_N , t_{N+1}]$ represents the interval between the last data point of the first season and the first data point of the second season, $\lambda_{k+N}=\lambda_k$ by periodicity, and we have the identity $\tau=\sum_{k=1}^{N}\Delta t_k$.  Under this form of $\Delta(t)$, the dynamics in Eq. (1) have a closed from solution $x(t)$, and we can find analytic expressions for the Fourier modes $\Lambda_n$. The Fourier modes are not needed for the curve fitting, but are included at the end of this document for reference.  Denoting the values $x(t)$ at times $(t_1, t_2, ..., t_N)$ by $\mathbf{x}=(x_1, x_2, ..., x_N)$, and where $x_{k+N}$
 
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
@@ -19,5 +71,4 @@ knitr::opts_chunk$set(
 ```
 
 ```{r setup}
-library(mosqcontrol)
 ```
